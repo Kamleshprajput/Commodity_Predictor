@@ -11,8 +11,8 @@ def get_gemini_model():
     try:
         # Initialize the Google chat model with the API key
         gemini_model = ChatGoogleGenerativeAI(
-            api_key="GEMINI_API_KEY",
-            model="MODEL_NAME",
+            api_key=GEMINI_API_KEY,
+            model=MODEL_NAME,
             temperature=0.3,
         )
         return gemini_model
