@@ -4,7 +4,8 @@ from models.embeddings import get_embedding
 
 CHUNKS = []
 EMBEDDINGS = []
-
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+DATA_PATH = os.path.join(BASE_DIR, "data")
 def split_text(text, chunk_size=400):
     chunks = []
     for i in range(0, len(text), chunk_size):
@@ -16,8 +17,8 @@ def load_documents():
     global CHUNKS, EMBEDDINGS
     if CHUNKS:
         return
-    for file in os.listdir("data"):
-        with open(f"data/{file}") as f:
+    for file in os.listdir(DATA_PATH):
+        with open(os.path.join(DATA_PATH, file)) as f:
             text = f.read()
             chunks = split_text(text)
             for chunk in chunks:
