@@ -5,7 +5,11 @@ from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 from models.llm import get_gemini_model
 
-#
+# NEW IMPORTS
+from utils.rag_utils import retrieve_context
+from utils.web_search import search_news
+
+
 def get_chat_response(chat_model, messages, system_prompt):
     """Get response from the chat model"""
     try:
@@ -109,10 +113,29 @@ def instructions_page():
 def chat_page():
     """Main chat interface page"""
     st.title("🤖 AI ChatBot")
-    
+    mode=st.radio("Response Mode",["Concise", "Detailed"])
     # Get configuration from environment variables or session state
     # Default system prompt
-    system_prompt = ""
+    system_prompt = """
+You are an AI assistant specializing in commodity market analysis.
+
+Your job is to analyze commodities like:
+- Gold
+- Silver
+- Crude Oil
+
+You are provided with:
+1. Knowledge from a local document database (RAG)
+2. Latest news headlines
+3. Market sentiment analysis
+
+Use this information to explain market trends clearly.
+
+When answering:
+- Explain whether the market looks bullish, bearish, or neutral
+- Use the provided context and news
+- Keep answers clear and structured
+"""
     
     
     # Determine which provider to use based on available API keys
@@ -140,13 +163,32 @@ def chat_page():
         # Generate and display bot response
         with st.chat_message("assistant"):
             with st.spinner("Getting response..."):
-                response = get_chat_response(chat_model, st.session_state.messages, system_prompt)
+                context=retrieve_context(prompt)
+                news=search_news(prompt)
+                enhanced_prompt=f"""
+You are an AI assistant specializing in commodity markets.
+
+User Question:
+{prompt}
+
+Relevant knowledge from documents:
+{context}
+
+Recent news headlines:
+{news}
+
+Provide a {mode} response.
+If possible explain whether the trend is bullish, bearish or neutral.
+"""
+                temp_messages=st.session_state.messages.copy()
+                temp_messages[-1]={"role": "user", "content": enhanced_prompt}
+                response = get_chat_response(chat_model, temp_messages, system_prompt)
                 st.markdown(response)
         
         # Add bot response to chat history
         st.session_state.messages.append({"role": "assistant", "content": response})
     else:
-        st.info("🔧 No API keys found in environment variables. Please check the Instructions page to set up your API keys.")
+        st.info("🔧 Enter your question.")
 
 def main():
     st.set_page_config(
