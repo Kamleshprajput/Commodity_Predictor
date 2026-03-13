@@ -3,7 +3,7 @@ import os
 import sys
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
-from models.llm import get_chatgroq_model
+from models.llm import get_gemini_model
 
 
 def get_chat_response(chat_model, messages, system_prompt):
@@ -116,7 +116,7 @@ def chat_page():
     
     
     # Determine which provider to use based on available API keys
-    chat_model = get_chatgroq_model()
+    chat_model = get_gemini_model()
     
     # Initialize chat history
     if "messages" not in st.session_state:
