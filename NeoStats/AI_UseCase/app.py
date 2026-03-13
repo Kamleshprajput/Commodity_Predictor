@@ -5,7 +5,7 @@ from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 from models.llm import get_gemini_model
 
-
+#
 def get_chat_response(chat_model, messages, system_prompt):
     """Get response from the chat model"""
     try:
